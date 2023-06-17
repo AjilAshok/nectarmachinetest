@@ -10,8 +10,6 @@ class AudioRecorderProvider with ChangeNotifier {
   FlutterSoundRecorder? recorder;
   Box<AudioRecording>? audioRecordingsBox;
   List<AudioRecording> audioRecordings = [];
-  // final GlobalKey<NavigatorState> navigatorKey;
-  // AudioRecorderProvider(this.navigatorKey);
 
   Future<void> initRecorder() async {
     final status = await Permission.microphone.request();
@@ -47,23 +45,19 @@ class AudioRecorderProvider with ChangeNotifier {
     return 'recording_$timestamp-$uniqueId.wav';
   }
 
-  Future<void> audioSave() async {
+  Future<void> audioSave(String name, String min, String sec) async {
     final filePath = await recorder?.stopRecorder();
-    print(filePath);
+
     final audioRecording = AudioRecording(
-      name: generateUniqueFileName(),
+      name: name,
       path: filePath.toString(),
+      minutues: min,
+      seconds: sec,
     );
+    
     audioRecordingsBox?.add(audioRecording);
     initAudioRecordingsBox();
-
     notifyListeners();
-    // Navigator.of(context).pop();
-    // Navigator.of(
-    //   navigatorKey.currentContext!,
-    // ).push(MaterialPageRoute(
-    //   builder: (context) => HomePage(),
-    // ));
   }
 
   Future<void> fetchAudioRecordings() async {
@@ -79,8 +73,9 @@ class AudioRecorderProvider with ChangeNotifier {
     audioRecordings.removeAt(index);
     notifyListeners();
   }
-   void navigateToPage(BuildContext context) {
-    Navigator.push(
+
+  void navigateToPage(BuildContext context) {
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const HomePage()),
     );

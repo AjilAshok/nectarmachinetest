@@ -3,8 +3,10 @@ import 'package:flutter_sound/flutter_sound.dart';
 
 class AudioPlayerPage extends StatefulWidget {
   final String audioFilePath;
+  final String title;
 
-  AudioPlayerPage({required this.audioFilePath});
+  const AudioPlayerPage(
+      {super.key, required this.audioFilePath, required this.title});
 
   @override
   _AudioPlayerPageState createState() => _AudioPlayerPageState();
@@ -67,20 +69,22 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
               height: 250,
               width: 250,
               decoration: BoxDecoration(
-                  image: DecorationImage(
+                  image: const DecorationImage(
                       image: AssetImage(
                         'asset/images.png',
                       ),
                       fit: BoxFit.cover),
                   borderRadius: BorderRadius.circular(100),
                   color: Colors.blue),
-              // child: Image.asset('asset/disc.jpg'),
             ),
-            // Icon(
-            //   _isPlaying ? Icons.volume_up : Icons.volume_off,
-            //   size: 100,
-            // ),
-            SizedBox(height: 20),
+            const SizedBox(
+              height: 20,
+            ),
+            Text(
+              widget.title,
+              style: const TextStyle(color: Colors.black),
+            ),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _isPlaying ? _stopAudio : _playAudio,
               child: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
