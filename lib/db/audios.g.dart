@@ -19,17 +19,23 @@ class AudioRecordingAdapter extends TypeAdapter<AudioRecording> {
     return AudioRecording(
       name: fields[0] as String,
       path: fields[1] as String,
+      minutues: fields[2] as String,
+      seconds: fields[3] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, AudioRecording obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
-      ..write(obj.path);
+      ..write(obj.path)
+      ..writeByte(2)
+      ..write(obj.minutues)
+      ..writeByte(3)
+      ..write(obj.seconds);
   }
 
   @override
