@@ -5,6 +5,7 @@ import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 
 class AudioRecorderProvider with ChangeNotifier {
   FlutterSoundRecorder? recorder;
@@ -54,7 +55,7 @@ class AudioRecorderProvider with ChangeNotifier {
       minutues: min,
       seconds: sec,
     );
-    
+
     audioRecordingsBox?.add(audioRecording);
     initAudioRecordingsBox();
     notifyListeners();
@@ -79,5 +80,11 @@ class AudioRecorderProvider with ChangeNotifier {
       context,
       MaterialPageRoute(builder: (context) => const HomePage()),
     );
+  }
+
+  shareMethod(path) async {
+    final xFile = XFile(path);
+    await Share.shareXFiles([xFile], text: 'audios');
+    notifyListeners();
   }
 }

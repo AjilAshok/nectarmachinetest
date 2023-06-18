@@ -1,8 +1,10 @@
+import 'package:audioplayer/provider/audio_playing_provider.dart';
 import 'package:audioplayer/provider/audio_provider.dart';
 import 'package:audioplayer/screens/homescreen/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'db/audios.dart';
 
 void main() async {
@@ -15,7 +17,8 @@ void main() async {
   final audioRecordingsProvider = AudioRecorderProvider();
   await audioRecordingsProvider.fetchAudioRecordings();
 
-  runApp(MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (_) => AudioPlayerProvider(), child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:audioplayer/screens/audio_playing.dart';
+import 'package:audioplayer/screens/audio_playing_screen/audio_playing.dart';
 import 'package:audioplayer/screens/audio_record/audio_record_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +41,9 @@ class HomePage extends StatelessWidget {
         // final audioRecordings = audioRecordingsProvider.audioRecordings;
 
         return Scaffold(
+          appBar: AppBar(
+            title: Text('Audio Player'),
+          ),
           body: ListView.builder(
             itemCount: value.audioRecordings.length,
             itemBuilder: (context, index) {
@@ -67,6 +70,17 @@ class HomePage extends StatelessWidget {
                     ),
                     Text(
                         '${audioRecording.minutues}:${audioRecording.seconds}'),
+
+                    TextButton(
+                      onPressed: () async {
+                        await AudioRecorderProvider()
+                            .shareMethod(audioRecording.path);
+                      },
+                      child: const Text(
+                        'Share',
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                    ),
                   ],
                 ),
                 trailing: IconButton(
