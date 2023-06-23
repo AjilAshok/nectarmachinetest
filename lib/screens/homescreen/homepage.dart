@@ -44,10 +44,11 @@ class _HomePageState extends State<HomePage> {
             ),
             floatingActionButton: FloatingActionButton(
               onPressed: () {
-                Navigator.push(
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
                       builder: (context) => const AudioRecorderPage()),
+                  (route) => true,
                 );
               },
               child: const Icon(Icons.mic),
