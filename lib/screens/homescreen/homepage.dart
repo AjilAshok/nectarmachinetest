@@ -36,6 +36,7 @@ class _HomePageState extends State<HomePage> {
         print(value.audioRecordings.length);
         if (value.audioRecordings.isEmpty) {
           return Scaffold(
+            backgroundColor: const Color(0xFFD6E3EB),
             body: const Center(
               child: Text(
                 'No Recors',
@@ -43,6 +44,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             floatingActionButton: FloatingActionButton(
+              backgroundColor: Colors.white,
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
                   context,
