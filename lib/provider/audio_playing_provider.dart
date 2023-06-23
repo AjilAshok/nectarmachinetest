@@ -1,21 +1,35 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/public/flutter_sound_player.dart';
 
 class AudioPlayerProvider extends ChangeNotifier {
-  FlutterSoundPlayer _player = FlutterSoundPlayer();
+  FlutterSoundPlayer player = FlutterSoundPlayer();
   bool _isPlaying = false;
+  double _sliderValue = 0.0;
+  int currentPosition = 0;
+
+  double get sliderValue => _sliderValue;
+
+  Duration? duration;
+
+  AudioPlayer? audioPlayer;
 
   bool get isPlaying => _isPlaying;
 
   Future<void> initializeAudioPlayer() async {
-    await _player.openPlayer();
-    _player.setSubscriptionDuration(Duration(milliseconds: 500));
+    await player.openPlayer();
+
+    player.setSubscriptionDuration(Duration(milliseconds: 500));
+    audioPlayer = AudioPlayer();
   }
 
   Future<void> playAudio(String audioFilePath) async {
     try {
-      await _player.startPlayer(fromURI: audioFilePath);
+      await player.startPlayer(fromURI: audioFilePath);
+      audioPlayer!.setSource(UrlSource(audioFilePath));
+
       _isPlaying = true;
+
       notifyListeners();
     } catch (e) {
       print('Error playing audio: $e');
@@ -24,7 +38,8 @@ class AudioPlayerProvider extends ChangeNotifier {
 
   Future<void> stopAudio() async {
     try {
-      await _player.stopPlayer();
+      await player.stopPlayer();
+      duration = await audioPlayer!.getDuration();
       _isPlaying = false;
       notifyListeners();
     } catch (e) {
@@ -34,7 +49,13 @@ class AudioPlayerProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    _player.closePlayer();
+    player.closePlayer();
+    audioPlayer!.dispose();
     super.dispose();
+  }
+
+  void setSliderValue(double value) {
+    _sliderValue = value;
+    notifyListeners();
   }
 }

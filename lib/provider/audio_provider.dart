@@ -1,6 +1,7 @@
 import 'package:audioplayer/db/audios.dart';
 import 'package:audioplayer/screens/homescreen/homepage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -12,14 +13,27 @@ class AudioRecorderProvider with ChangeNotifier {
   Box<AudioRecording>? audioRecordingsBox;
   List<AudioRecording> audioRecordings = [];
 
-  Future<void> initRecorder() async {
+  String? filePath;
+  bool isPaused = false;
+  bool visible = false;
+
+  Future<void> initRecorder(BuildContext context) async {
     final status = await Permission.microphone.request();
     if (status != PermissionStatus.granted) {
-      throw 'Permission not granted';
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Microphone permission not granted.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
     }
     recorder = FlutterSoundRecorder();
+
     await recorder!.openRecorder();
     recorder!.setSubscriptionDuration(const Duration(milliseconds: 500));
+
     notifyListeners();
   }
 
@@ -29,7 +43,8 @@ class AudioRecorderProvider with ChangeNotifier {
   }
 
   Future<void> stopRecorder() async {
-    await recorder?.stopRecorder();
+    filePath = await recorder?.stopRecorder();
+    visible = true;
     notifyListeners();
   }
 
@@ -43,11 +58,17 @@ class AudioRecorderProvider with ChangeNotifier {
   String generateUniqueFileName() {
     final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
     final String uniqueId = UniqueKey().toString();
-    return 'recording_$timestamp-$uniqueId.wav';
+    return 'recording_$timestamp-$uniqueId.mp3';
   }
 
-  Future<void> audioSave(String name, String min, String sec) async {
-    final filePath = await recorder?.stopRecorder();
+  Future<void> audioSave(
+    String name,
+    String min,
+    String sec,
+  ) async {
+    filePath = await recorder?.stopRecorder();
+
+    // await audioPlayer!.
 
     final audioRecording = AudioRecording(
       name: name,
@@ -76,15 +97,30 @@ class AudioRecorderProvider with ChangeNotifier {
   }
 
   void navigateToPage(BuildContext context) {
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const HomePage()),
+      (route) => false,
     );
   }
 
   shareMethod(path) async {
     final xFile = XFile(path);
     await Share.shareXFiles([xFile], text: 'audios');
+    notifyListeners();
+  }
+
+  Future<void> pauseRecording() async {
+    await recorder!.pauseRecorder();
+
+    isPaused = true;
+    notifyListeners();
+  }
+
+  Future<void> resumeRecording() async {
+    await recorder!.resumeRecorder();
+
+    isPaused = false;
     notifyListeners();
   }
 }

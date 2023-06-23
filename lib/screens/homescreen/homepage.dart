@@ -6,8 +6,24 @@ import 'package:provider/provider.dart';
 
 import '../../provider/audio_provider.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<AudioRecorderProvider>();
+      provider.initRecorder(context);
+      provider.initAudioRecordingsBox(); // Call the method to open the Hive box
+    });
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,62 +54,87 @@ class HomePage extends StatelessWidget {
             ),
           );
         }
-        // final audioRecordings = audioRecordingsProvider.audioRecordings;
 
         return Scaffold(
+          backgroundColor: const Color(0xFFD6E3EB),
           appBar: AppBar(
-            title: Text('Audio Player'),
+            backgroundColor: const Color(0xFFD6E3EB),
+            centerTitle: true,
+            title: const Text('Recordings'),
           ),
           body: ListView.builder(
             itemCount: value.audioRecordings.length,
             itemBuilder: (context, index) {
               final audioRecording = value.audioRecordings[index];
-              return ListTile(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AudioPlayerPage(
-                        audioFilePath: audioRecording.path,
-                        title: audioRecording.name,
-                      ),
-                    ),
-                  );
-                },
-                title: Text(audioRecording.name),
-                subtitle: Row(
-                  children: [
-                    // Text('size'),
-                    sizedOfaudio(audioRecording.path),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    Text(
-                        '${audioRecording.minutues}:${audioRecording.seconds}'),
+              return Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20)),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AudioPlayerPage(
+                            audioFilePath: audioRecording.path,
+                            title: audioRecording.name,
+                            sec: audioRecording.seconds,
+                            min: audioRecording.minutues,
+                          ),
+                        ),
+                      );
+                    },
+                    title: Text(audioRecording.name),
+                    subtitle: Row(
+                      children: [
+                        // Text('size'),
+                        sizedOfaudio(audioRecording.path),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Text(
+                            '${audioRecording.minutues}:${audioRecording.seconds}'),
 
-                    TextButton(
-                      onPressed: () async {
-                        await AudioRecorderProvider()
-                            .shareMethod(audioRecording.path);
+                        TextButton(
+                          onPressed: () async {
+                            await AudioRecorderProvider()
+                                .shareMethod(audioRecording.path);
+                          },
+                          child: const Text(
+                            'Share',
+                            style: TextStyle(color: Colors.green),
+                          ),
+                        ),
+                      ],
+                    ),
+                    trailing: IconButton(
+                      onPressed: () {
+                        _showAlertDialog(
+                            context, audioRecording.name, value, index);
                       },
-                      child: const Text(
-                        'Share',
-                        style: TextStyle(color: Colors.blue),
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
                       ),
                     ),
-                  ],
-                ),
-                trailing: IconButton(
-                  onPressed: () {
-                    _showAlertDialog(
-                        context, audioRecording.name, value, index);
-                  },
-                  icon: const Icon(Icons.delete),
-                ),
+                    leading: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                          color: const Color(0xFFD6E3EB),
+                          borderRadius: BorderRadius.circular(100)),
+                      child: const Icon(
+                        Icons.play_arrow,
+                        color: Colors.black,
+                      ),
+                    )),
               );
             },
           ),
           floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.white,
             onPressed: () {
               // Navigate to the audio recording screen
               Navigator.push(
